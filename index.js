@@ -375,6 +375,27 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// API endpoint to retrieve age, height, and weight by name
+app.get('/api/user/:name', async (req, res) => {
+  const { name } = req.params;
+
+  try {
+    const user = await Gameuser2.findOne({ name });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { age, height, weight } = user;
+    res.json({ age, height, weight });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 app.get('/api/users/:objectId', async (req, res) => {
   const { objectId } = req.params;
 
