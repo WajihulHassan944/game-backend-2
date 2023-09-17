@@ -42,6 +42,9 @@ const userSchema2 = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
+  age: String,
+  height: String,
+  weight: String,
   creditCardInformation: String
 });
 const Gameuser2 = new mongoose.model("Gameuser2", userSchema2);
@@ -343,7 +346,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
-  const { name, email, password , creditCardInformation} = req.body;
+  const { name, email, password ,age ,height, weight, creditCardInformation} = req.body;
 
   try {
     const existingUser = await Gameuser2.findOne({ email: email });
@@ -357,6 +360,10 @@ app.post('/api/register', async (req, res) => {
         name: name,
         email: email,
         password: hashedPassword,
+        age: age,
+        height: height,
+        weight: weight,
+  
         creditCardInformation:creditCardInformation, 
       });
 
