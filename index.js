@@ -395,6 +395,23 @@ app.get('/api/user/:name', async (req, res) => {
 });
 
 
+// Delete a user by ObjectId
+app.delete('/api/userToDelete/:objectId', async (req, res) => {
+  const { objectId } = req.params;
+
+  try {
+    const deletedUser = await Gameuser2.findByIdAndDelete(objectId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/api/users/:objectId', async (req, res) => {
   const { objectId } = req.params;
