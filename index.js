@@ -372,6 +372,7 @@ transporter.sendMail(storeMailOptions, function(error, storeInfo) {
 // Define Schema
 const scoreSchema = new mongoose.Schema({
   playerName: String,
+  matchId:String,
   playerRound: Number,
   hpPrediction1: Number,
   hpPrediction2: Number,
@@ -391,6 +392,7 @@ app.post('/api/scores', async (req, res) => {
   try {
     const {
       playerName,
+      matchId,
       playerRound,
       hpPrediction1,
       bpPrediction1,
@@ -406,6 +408,7 @@ app.post('/api/scores', async (req, res) => {
 
     const score = new Score({
       playerName,
+      matchId,
       playerRound,
       hpPrediction1,
       bpPrediction1,
@@ -425,6 +428,7 @@ app.post('/api/scores', async (req, res) => {
     res.status(400).send(error);
   }
 });
+
 app.delete('/api/scores/:playerName', async (req, res) => {
   const playerName = req.params.playerName;
 
