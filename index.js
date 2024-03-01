@@ -511,6 +511,7 @@ app.delete('/api/scores/:id', async (req, res) => {
 
 const scoreSchemamma = new mongoose.Schema({
   playerName: String,
+  matchId:String,
   playerRound: Number,
   stPrediction1: Number,
   stPrediction2: Number,
@@ -545,11 +546,11 @@ app.delete('/api/mma/scores/:playerName', async (req, res) => {
   }
 });
 
-// API endpoint to create MMA scores
 app.post('/api/mma/scores', async (req, res) => {
   try {
     const {
       playerName,
+      matchId,
       playerRound,
       stPrediction1,
       stPrediction2,
@@ -565,25 +566,51 @@ app.post('/api/mma/scores', async (req, res) => {
       rwPrediction2,
     } = req.body;
 
-    const scoreMma = new ScoreMma({
-      playerName,
-      playerRound,
-      stPrediction1,
-      stPrediction2,
-      kiPrediction1,
-      kiPrediction2,
-      knPrediction1,
-      knPrediction2,
-      elPrediction1,
-      elPrediction2,
-      spPrediction1,
-      spPrediction2,
-      rwPrediction1,
-      rwPrediction2,
-    });
+    // Check if there's an existing record with the same playerName, matchId, and playerRound
+    let existingMmaScore = await ScoreMma.findOne({ playerName, matchId, playerRound });
 
-    await scoreMma.save();
-    res.status(201).send(scoreMma);
+    if (existingMmaScore) {
+      // If a record exists, update its values
+      existingMmaScore.stPrediction1 = stPrediction1;
+      existingMmaScore.stPrediction2 = stPrediction2;
+      existingMmaScore.kiPrediction1 = kiPrediction1;
+      existingMmaScore.kiPrediction2 = kiPrediction2;
+      existingMmaScore.knPrediction1 = knPrediction1;
+      existingMmaScore.knPrediction2 = knPrediction2;
+      existingMmaScore.elPrediction1 = elPrediction1;
+      existingMmaScore.elPrediction2 = elPrediction2;
+      existingMmaScore.spPrediction1 = spPrediction1;
+      existingMmaScore.spPrediction2 = spPrediction2;
+      existingMmaScore.rwPrediction1 = rwPrediction1;
+      existingMmaScore.rwPrediction2 = rwPrediction2;
+
+      // Save the updated record
+      await existingMmaScore.save();
+      res.status(200).send(existingMmaScore);
+    } else {
+      // If no record exists, create a new one
+      const scoreMma = new ScoreMma({
+        playerName,
+        matchId,
+        playerRound,
+        stPrediction1,
+        stPrediction2,
+        kiPrediction1,
+        kiPrediction2,
+        knPrediction1,
+        knPrediction2,
+        elPrediction1,
+        elPrediction2,
+        spPrediction1,
+        spPrediction2,
+        rwPrediction1,
+        rwPrediction2,
+      });
+
+      // Save the new record
+      await scoreMma.save();
+      res.status(201).send(scoreMma);
+    }
   } catch (error) {
     res.status(400).send(error);
   }
