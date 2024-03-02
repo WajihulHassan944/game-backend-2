@@ -192,6 +192,10 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Configure multer for file upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 app.post('/api/register', upload.single('image'), async (req, res) => {
   const formData = new FormData();
   const { default: fetch } = await import('node-fetch');
