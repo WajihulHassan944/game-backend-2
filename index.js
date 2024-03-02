@@ -191,6 +191,7 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+const multer = require('multer');
 
 // Configure multer for file upload
 const storage = multer.memoryStorage();
