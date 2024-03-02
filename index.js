@@ -27,13 +27,13 @@ app.use(bodyParser.json());
 const bcrypt = require('bcrypt');
 
 const userSchema2 = new mongoose.Schema({
+  url: String,
   name: String,
   email: String,
   password: String,
   age: String,
   height: String,
-  weight: String,
-  creditCardInformation: String
+  weight: String
 });
 const Gameuser2 = new mongoose.model("Gameuser2", userSchema2);
 
@@ -192,8 +192,21 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.post('/api/register', async (req, res) => {
-  const { name, email, password ,age ,height, weight, creditCardInformation} = req.body;
+app.post('/api/register', upload.single('image'), async (req, res) => {
+  const formData = new FormData();
+  const { default: fetch } = await import('node-fetch');
+  formData.append('image', req.file.buffer.toString('base64'));
+
+  const response = await fetch('https://api.imgbb.com/1/upload?key=368cbdb895c5bed277d50d216adbfa52', {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  const imageUrl = data.data.url;
+  const { name, email, password ,age ,height, weight} = req.body; // Destructure title and text from req.body
+
 
   try {
     const existingUser = await Gameuser2.findOne({ email: email });
@@ -204,6 +217,7 @@ app.post('/api/register', async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
 
       const newUser = new Gameuser2({
+        url: imageUrl,
         name: name,
         email: email,
         password: hashedPassword,
@@ -211,7 +225,6 @@ app.post('/api/register', async (req, res) => {
         height: height,
         weight: weight,
   
-        creditCardInformation:creditCardInformation, 
       });
 
       await newUser.save();
@@ -221,6 +234,8 @@ app.post('/api/register', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
 
 // API endpoint to retrieve age, height, and weight by name
 app.get('/api/user/:name', async (req, res) => {
@@ -478,6 +493,11 @@ app.get('/api/scores', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+
+
+
 // API endpoint to delete a score by ID
 app.delete('/api/scores/:id', async (req, res) => {
   try {
