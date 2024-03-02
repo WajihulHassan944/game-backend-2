@@ -6,7 +6,6 @@ const { ObjectId } = require('mongodb');
 const cors = require("cors");
 const FormData = require('form-data');
 
-
 app.use(express.json());
 app.use(cors());
 
