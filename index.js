@@ -661,7 +661,8 @@ app.get('/api/mma/scores', async (req, res) => {
 const blogsSchema = new mongoose.Schema({
   url: String,
   title: String,
-  text: String
+  text: String,
+  blogDate: Date
 });
 
 const Blogs = mongoose.model('Blogs', blogsSchema);
@@ -679,10 +680,10 @@ app.post('/uploadBlogFmma', upload.single('image'), async (req, res) => {
   const data = await response.json();
 
   const imageUrl = data.data.url;
-  const { title, text } = req.body; // Destructure title and text from req.body
+  const { title, text , blogDate } = req.body; // Destructure title and text from req.body
 
   // Save the image URL, title, and text to the database
-  const newBlog = new Blogs({ url: imageUrl, title: title, text: text });
+  const newBlog = new Blogs({ url: imageUrl, title: title, text: text, blogDate: blogDate });
   await newBlog.save();
   res.status(200).send('Blog uploaded successfully');
 });
