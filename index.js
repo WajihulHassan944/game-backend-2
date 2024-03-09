@@ -732,7 +732,35 @@ app.get('/blogsFmma', async (req, res) => {
 
 
 
+//code for feedback start
 
+const feedbacksSchema = new mongoose.Schema({
+  feedback: String,
+  userUrl: String,
+  userName: String,
+});
+
+const Feedback = mongoose.model('Feedback', feedbacksSchema);
+
+app.post('/uploadFeedback', async (req, res) => {
+  
+  const { feedback, userUrl, userName } = req.body; // Destructure title and text from req.body
+
+  // Save the image URL, title, and text to the database
+  const newFeedback = new Feedback({feedback: feedback, userUrl: userUrl, userName: userName });
+  await newFeedback.save();
+  res.status(200).send('Feedback uploaded successfully');
+});
+
+
+// Define route for fetching images
+app.get('/feedbacks', async (req, res) => {
+  const images = await Feedback.find();
+  res.send(images);
+});
+
+
+//code for feedback end
 
 
 
