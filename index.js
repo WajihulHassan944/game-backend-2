@@ -738,18 +738,26 @@ const feedbacksSchema = new mongoose.Schema({
   feedback: String,
   userUrl: String,
   userName: String,
+  matchId: String,
 });
 
 const Feedback = mongoose.model('Feedback', feedbacksSchema);
-
 app.post('/uploadFeedback', async (req, res) => {
-  
-  const { feedback, userUrl, userName } = req.body; // Destructure title and text from req.body
+  const { feedback, userUrl, userName, matchId } = req.body; // Destructure title and text from req.body
 
-  // Save the image URL, title, and text to the database
-  const newFeedback = new Feedback({feedback: feedback, userUrl: userUrl, userName: userName });
+  // Check if the matchId already exists in the database
+  const existingFeedback = await Feedback.findOne({ matchId: matchId });
+
+  if (existingFeedback) {
+    // If the matchId already exists, return a message indicating that the feedback already exists for this match
+    return res.status(400).send('Feedback already exists for this match');
+  }
+
+  // If the matchId doesn't exist, save the feedback to the database
+  const newFeedback = new Feedback({ feedback: feedback, userUrl: userUrl, userName: userName, matchId: matchId });
   await newFeedback.save();
-  res.status(200).send('Feedback uploaded successfully');
+
+  res.status(200).send('Feedback saved successfully');
 });
 
 
