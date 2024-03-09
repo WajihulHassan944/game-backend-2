@@ -742,23 +742,33 @@ const feedbacksSchema = new mongoose.Schema({
 });
 
 const Feedback = mongoose.model('Feedback', feedbacksSchema);
+
+
 app.post('/uploadFeedback', async (req, res) => {
-  const { feedback, userUrl, userName, matchId } = req.body; // Destructure title and text from req.body
+  const { feedback, userUrl, userName, matchId } = req.body;
 
-  // Check if the matchId already exists in the database
-  const existingFeedback = await Feedback.findOne({ matchId: matchId });
+  try {
+    // Check if the user with the given username has already submitted feedback for this match
+    const existingFeedback = await Feedback.findOne({ matchId: matchId, userName: userName });
+    
+    if (existingFeedback) {
+      // If the feedback already exists for this match and user, return a message
+      return res.status(400).send('Feedback already exists for this match and user');
+    }
 
-  if (existingFeedback) {
-    // If the matchId already exists, return a message indicating that the feedback already exists for this match
-    return res.status(400).send('Feedback already exists for this match');
+    // If the feedback doesn't exist for this match and user, save the feedback to the database
+    const newFeedback = new Feedback({ feedback: feedback, userUrl: userUrl, userName: userName, matchId: matchId });
+    await newFeedback.save();
+
+    res.status(200).send('Feedback saved successfully');
+  } catch (error) {
+    console.error('Error saving feedback:', error);
+    res.status(500).send('Internal server error');
   }
-
-  // If the matchId doesn't exist, save the feedback to the database
-  const newFeedback = new Feedback({ feedback: feedback, userUrl: userUrl, userName: userName, matchId: matchId });
-  await newFeedback.save();
-
-  res.status(200).send('Feedback saved successfully');
 });
+
+
+
 
 
 // Define route for fetching images
