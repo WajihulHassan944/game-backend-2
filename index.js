@@ -786,6 +786,48 @@ app.get('/feedbacks', async (req, res) => {
 
 
 
+//code for globalLeaderBoard start
+
+const globalLeaderBoardSchema = new mongoose.Schema({
+  usersName: String,
+  totalPoint: String,
+  matchId: String,
+  matchType: String,
+});
+
+const GlobalLeaderBoard = mongoose.model('GlobalLeaderBoard', globalLeaderBoardSchema);
+
+
+app.post('/globalLeaderBoard', async (req, res) => {
+  const { usersName, totalPoint, matchId, matchType } = req.body;
+
+  try {
+   
+    const newGlobalLeaderBoard = new GlobalLeaderBoard({ usersName:usersName, totalPoint:totalPoint, matchId:matchId, matchType:matchType });
+    await newGlobalLeaderBoard.save();
+
+    res.status(200).send('scores global saved successfully');
+  } catch (error) {
+    console.error('Error saving feedback:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+
+
+
+// Define route for fetching images
+app.get('/api/globalLeaderBoard', async (req, res) => {
+  const images = await GlobalLeaderBoard.find();
+  res.send(images);
+});
+
+
+//code for globalLeaderBoard end
+
+
+
 
 
 app.get("/", (req,res) =>{
