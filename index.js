@@ -261,6 +261,24 @@ app.get('/api/user/:name', async (req, res) => {
   }
 });
 
+// API endpoint to retrieve all user data by name
+app.get('/api/user/leaderboard/:name', async (req, res) => {
+  const { name } = req.params;
+
+  try {
+    const user = await Gameuser2.findOne({ name });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user); // Send all user data
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Delete a user by ObjectId
 app.delete('/api/userToDelete/:objectId', async (req, res) => {
