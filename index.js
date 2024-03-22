@@ -803,18 +803,20 @@ app.post('/globalLeaderBoard', async (req, res) => {
 
   try {
     // Check if there is an existing entry with the same user name, total points, and match type
-    const existingEntry = await GlobalLeaderBoard.findOne({ usersName: usersName, totalPoint: totalPoint, matchType: matchType });
+    const existingEntry = await GlobalLeaderBoard.findOne({ usersName: usersName, totalPoint: totalPoint, matchId: matchId, matchType: matchType });
 
     // If an existing entry is found, return a message indicating the duplicate
     if (existingEntry) {
+      console.log("existing entry for  global leaderboard");
       return res.status(400).send('Duplicate entry detected');
+      
+    } else {
+      // If no duplicate entry found, save the new entry to the database
+      const newGlobalLeaderBoard = new GlobalLeaderBoard({ usersName: usersName, totalPoint: totalPoint, matchId: matchId, matchType: matchType });
+      await newGlobalLeaderBoard.save();
+
+      res.status(200).send('Scores saved successfully');
     }
-
-    // If no duplicate entry found, save the new entry to the database
-    const newGlobalLeaderBoard = new GlobalLeaderBoard({ usersName: usersName, totalPoint: totalPoint, matchId: matchId, matchType: matchType });
-    await newGlobalLeaderBoard.save();
-
-    res.status(200).send('Scores saved successfully');
   } catch (error) {
     console.error('Error saving scores:', error);
     res.status(500).send('Internal server error');
